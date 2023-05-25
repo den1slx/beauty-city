@@ -65,7 +65,7 @@ def create_order(message: telebot.types.Message, step=0):
     elif step == 3:  # choose decade
         user['service'] = message.text
         text = 'Выберите числа'
-        if user['text'] == 'Позвонить':
+        if message.text == 'Позвонить':
             get_number(message)
             return
         if user['type'] == 'мастер':
