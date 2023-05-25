@@ -17,15 +17,13 @@ chats = {}
 number = types.KeyboardButton(text='Позвонить')
 enroll = types.KeyboardButton(text='Записаться')
 info = types.KeyboardButton(text='О нас')
-menu = types.KeyboardButton(text='В меню')
 choose_salon = types.KeyboardButton(text='Выбрать салон')
 choose_master = types.KeyboardButton(text='Выбрать мастера')
-choose_time = types.KeyboardButton(text='Выбрать время')
-nearest_time = types.KeyboardButton(text='Ближайшее время')
 accept = types.KeyboardButton(text='Подтвердить')
 back = types.KeyboardButton(text='Назад')
 skip = types.KeyboardButton(text='Пропустить')
 pay = types.KeyboardButton(text='Оплатить')
+cancel = types.KeyboardButton(text='Отменить')
 
 
 # markups
@@ -33,17 +31,16 @@ markup_menu = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=
 markup_menu.add(info, number, enroll)
 
 markup_choose = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-markup_choose.add(choose_master, choose_salon, back, number)
-
-markup_dt = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-markup_dt.add(choose_time, menu, back, number)
+markup_choose.add(choose_master, choose_salon, number)
 
 markup_accept = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-markup_accept.add(accept, menu, back, number)
+markup_accept.add(accept, cancel)
 
 markup_pay = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-markup_accept.add(pay, skip)
+markup_pay.add(pay, skip)
 
+markup_skip = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+markup_skip.add(skip)
 
 # quick markup
 client_markup = quick_markup({
