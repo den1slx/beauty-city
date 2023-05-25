@@ -1,4 +1,4 @@
-from order_bot.other import *
+from order_bot.other import telebot, bot
 import order_bot.bot_functoins as calls
 
 
