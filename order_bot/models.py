@@ -16,6 +16,7 @@ class Client(models.Model):
         max_length=12,
         unique=True
     )
+    prepay = models.BooleanField(default=False, null=True)
 
     class Meta:
         verbose_name = 'Клиент'
@@ -34,18 +35,18 @@ class Master(models.Model):
         'ФИО',
         max_length=32
     )
-    service = models.ForeignKey(
+    service = models.ManyToManyField(
         'Procedure',
         related_name='masters',
-        on_delete=models.SET_NULL,
-        verbose_name='Услуга мастера',
-        null=True
+        verbose_name='Услуги мастера',
+        blank=True,
     )
     phone_number = PhoneNumberField(
         'Телефон',
         max_length=12,
         unique=True
     )
+    worktime = models.ManyToManyField('WorkTime', verbose_name='Время работы', related_name='master', blank=True)
 
     class Meta:
         verbose_name = 'Мастер'
@@ -92,6 +93,11 @@ class Salon(models.Model):
         'Адрес салона',
         max_length=100
     )
+    open_time = models.TimeField(null=True, verbose_name='Время открытия')
+    close_time = models.TimeField(null=True, verbose_name='Время закрытия')
+    procedures = models.ManyToManyField('Procedure', verbose_name='Оказываемые услуги', related_name='salon')
+    workers = models.ManyToManyField('Master', verbose_name='Наши специалисты', related_name='salon')
+    days = models.ManyToManyField('WorkDay', verbose_name='Рабочие дни', related_name='salon')
 
     class Meta:
         verbose_name = 'Салон'
@@ -128,7 +134,7 @@ class Appointment(models.Model):
         'Дата приёма'
     )
     payment = models.BooleanField(
-        'Оплата процедуры',
+        'Предоплата процедуры',
         default=False
     )
 
@@ -138,3 +144,33 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f'Прием {self.client}'
+
+
+class WorkTime(models.Model):
+    begin = models.TimeField(verbose_name='Начало смены')
+    end = models.TimeField(verbose_name='Конец смены')
+    worker = models.OneToOneField(
+        'Salon',
+        on_delete=models.CASCADE,
+        verbose_name='Место работы',
+        related_name='worktime',
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = 'Рабочие смены'
+        verbose_name_plural = 'Рабочие смены'
+
+    def __str__(self):
+        return f'С {self.begin} до {self.end}'
+
+
+class WorkDay(models.Model):
+    day = models.DateField()
+    worktime = models.ManyToManyField('WorkTime', verbose_name='Рабочие смены дня', related_name='worktime')
+
+    class Meta:
+        verbose_name_plural = 'Рабочие дни'
+
+    def __str__(self):
+        return f'{self.day}'
