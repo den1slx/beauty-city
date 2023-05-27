@@ -1,7 +1,8 @@
 import telebot
-from order_bot.other import bot, chats, client_markup, markup_choose,\
-    number, markup_accept, markup_skip, markup_pay
 from telebot import types
+
+from order_bot.other import bot, chats, client_markup, markup_choose, \
+    number, markup_accept, markup_skip, markup_pay
 
 
 def get_info(message: telebot.types.Message):
@@ -150,11 +151,12 @@ def create_order(message: telebot.types.Message, step=0):
 def get_number(message: telebot.types.Message):
     user = chats[message.chat.id]
     info = '''
-Наш номер: 8-800-555-3535
+    Наш номер: 8-800-555-3535
     Рады звонку в любое время!
     '''
     bot.send_message(message.chat.id, info)
     clean_user(user)
+    show_main_menu(message.chat.id)
 
 
 def get_agreement():
