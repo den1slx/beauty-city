@@ -16,7 +16,10 @@ class Client(models.Model):
         max_length=12,
         unique=True
     )
-    prepay = models.BooleanField(default=False, null=True)
+    prepay = models.BooleanField(
+        default=False,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'Клиент'
@@ -46,7 +49,11 @@ class Master(models.Model):
         max_length=12,
         unique=True
     )
-    worktime = models.ManyToManyField('WorkTime', verbose_name='Время работы', related_name='master', blank=True)
+    worktime = models.ManyToManyField(
+        'WorkTime',
+        related_name='master',
+        verbose_name='Время работы',
+        blank=True)
 
     class Meta:
         verbose_name = 'Мастер'
@@ -93,11 +100,29 @@ class Salon(models.Model):
         'Адрес салона',
         max_length=100
     )
-    open_time = models.TimeField(null=True, verbose_name='Время открытия')
-    close_time = models.TimeField(null=True, verbose_name='Время закрытия')
-    procedures = models.ManyToManyField('Procedure', verbose_name='Оказываемые услуги', related_name='salon')
-    workers = models.ManyToManyField('Master', verbose_name='Наши специалисты', related_name='salon')
-    days = models.ManyToManyField('WorkDay', verbose_name='Рабочие дни', related_name='salon')
+    open_time = models.TimeField(
+        verbose_name='Время открытия',
+        null=True
+    )
+    close_time = models.TimeField(
+        verbose_name='Время закрытия',
+        null=True
+    )
+    procedures = models.ManyToManyField(
+        'Procedure',
+        related_name='salon',
+        verbose_name='Оказываемые услуги'
+    )
+    workers = models.ManyToManyField(
+        'Master',
+        related_name='salon',
+        verbose_name='Наши специалисты'
+    )
+    days = models.ManyToManyField(
+        'WorkDay',
+        related_name='salon',
+        verbose_name='Рабочие дни'
+    )
 
     class Meta:
         verbose_name = 'Салон'
@@ -147,13 +172,21 @@ class Appointment(models.Model):
 
 
 class WorkTime(models.Model):
-    begin = models.TimeField(verbose_name='Начало смены')
-    end = models.TimeField(verbose_name='Конец смены')
+    """
+    Рабочее время мастера.
+    """
+
+    begin = models.TimeField(
+        verbose_name='Начало смены'
+    )
+    end = models.TimeField(
+        verbose_name='Конец смены'
+    )
     worker = models.OneToOneField(
         'Salon',
-        on_delete=models.CASCADE,
-        verbose_name='Место работы',
         related_name='worktime',
+        verbose_name='Место работы',
+        on_delete=models.CASCADE,
         null=True,
     )
 
@@ -166,8 +199,18 @@ class WorkTime(models.Model):
 
 
 class WorkDay(models.Model):
-    day = models.DateField()
-    worktime = models.ManyToManyField('WorkTime', verbose_name='Рабочие смены дня', related_name='worktime')
+    """
+    Рабочий день мастера.
+    """
+
+    day = models.DateField(
+        'Дата'
+    )
+    worktime = models.ManyToManyField(
+        'WorkTime',
+        related_name='worktime',
+        verbose_name='Рабочие смены дня'
+    )
 
     class Meta:
         verbose_name_plural = 'Рабочие дни'
