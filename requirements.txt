@@ -1,3 +1,4 @@
 Django==4.2.1
 environs[django]==9.5.0
-phonenumberslite==8.13.11
+django-phonenumber-field[phonenumbers]
+pyTelegramBotAPI==4.11.0
