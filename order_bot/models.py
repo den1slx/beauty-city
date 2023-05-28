@@ -136,6 +136,10 @@ class Appointment(models.Model):
         'Предоплата процедуры',
         default=False
     )
+    promo = models.BooleanField(
+        default=False,
+        null=True,
+    )
 
     class Meta:
         verbose_name = 'Расписание'
