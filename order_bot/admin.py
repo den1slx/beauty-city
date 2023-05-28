@@ -24,9 +24,9 @@ class SalonAdmin(admin.ModelAdmin):
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
-    fields = ('date', 'salon', 'name', 'phone_number', 'master', 'service', 'payment')
+    fields = ('date', 'salon', 'name', 'phone_number', 'master', 'service', 'payment', 'promo')
     list_display = ('date', 'salon', 'master', 'payment')
-    readonly_fields = ('payment',)
+    readonly_fields = ('payment', 'promo')
 
 
 @admin.register(WorkTime)
