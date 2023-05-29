@@ -6,8 +6,8 @@ from telebot.util import quick_markup
 
 Env().read_env()
 token = Env().str('TG_BOT_TOKEN')
+agreement = Env().str('AGREEMENT')
 bot = telebot.TeleBot(token)
-
 
 # empty
 chats = {}

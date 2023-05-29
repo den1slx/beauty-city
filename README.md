@@ -38,3 +38,4 @@ python manage.py createsuperuser
 - `SECRET_KEY` — секретный ключ проекта
 - `TG_BOT_TOKEN` — токен телеграмм бота
 - `ALLOWED_HOSTS` — см [документацию Django](https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts)
+- `AGREEMENT` - Путь к локальному `.pdf` документу

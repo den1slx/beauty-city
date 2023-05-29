@@ -2,33 +2,6 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Client(models.Model):
-    """
-    Клиент.
-    """
-
-    name = models.CharField(
-        'ФИО',
-        max_length=32
-    )
-    phone_number = PhoneNumberField(
-        'Телефон',
-        max_length=12,
-        unique=True
-    )
-    prepay = models.BooleanField(
-        default=False,
-        null=True
-    )
-
-    class Meta:
-        verbose_name = 'Клиент'
-        verbose_name_plural = 'Клиенты'
-
-    def __str__(self):
-        return f'{self.name} (id: {self.id})'
-
-
 class Master(models.Model):
     """
     Мастер салона красоты.
@@ -49,11 +22,6 @@ class Master(models.Model):
         max_length=12,
         unique=True
     )
-    worktime = models.ManyToManyField(
-        'WorkTime',
-        related_name='master',
-        verbose_name='Время работы',
-        blank=True)
 
     class Meta:
         verbose_name = 'Мастер'
@@ -84,7 +52,7 @@ class Procedure(models.Model):
         verbose_name_plural = 'Процедуры'
 
     def __str__(self):
-        return self.title
+        return f'{self.id}) {self.title}'
 
 
 class Salon(models.Model):
@@ -118,11 +86,6 @@ class Salon(models.Model):
         related_name='salon',
         verbose_name='Наши специалисты'
     )
-    days = models.ManyToManyField(
-        'WorkDay',
-        related_name='salon',
-        verbose_name='Рабочие дни'
-    )
 
     class Meta:
         verbose_name = 'Салон'
@@ -137,11 +100,15 @@ class Appointment(models.Model):
     Запись к мастеру (Расписание).
     """
 
-    client = models.ForeignKey(
-        Client,
-        on_delete=models.CASCADE,
-        related_name='appointments',
-        verbose_name='Клиент'
+    name = models.CharField(
+        'ФИО',
+        max_length=32,
+        null=True,
+    )
+    phone_number = PhoneNumberField(
+        'Телефон',
+        max_length=12,
+        null=True,
     )
     master = models.ForeignKey(
         Master,
@@ -158,9 +125,20 @@ class Appointment(models.Model):
     date = models.DateTimeField(
         'Дата приёма'
     )
+    service = models.ForeignKey(
+        'Procedure',
+        on_delete=models.CASCADE,
+        related_name='appointments',
+        verbose_name='Процедура',
+        null=True,
+    )
     payment = models.BooleanField(
         'Предоплата процедуры',
         default=False
+    )
+    promo = models.BooleanField(
+        default=False,
+        null=True,
     )
 
     class Meta:
@@ -168,7 +146,7 @@ class Appointment(models.Model):
         verbose_name_plural = 'Расписание'
 
     def __str__(self):
-        return f'Прием {self.client}'
+        return f'Прием {self.name} Телефон{self.phone_number}'
 
 
 class WorkTime(models.Model):
@@ -182,9 +160,16 @@ class WorkTime(models.Model):
     end = models.TimeField(
         verbose_name='Конец смены'
     )
-    worker = models.OneToOneField(
-        'Salon',
+    worker = models.ForeignKey(
+        'Master',
         related_name='worktime',
+        verbose_name='Мастер',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    workplace = models.ForeignKey(
+        'Salon',
+        related_name='workplace',
         verbose_name='Место работы',
         on_delete=models.CASCADE,
         null=True,
@@ -217,3 +202,21 @@ class WorkDay(models.Model):
 
     def __str__(self):
         return f'{self.day}'
+
+
+class Promo(models.Model):
+    promo = models.CharField(
+        'Промокод',
+        max_length=20
+    )
+    status = models.BooleanField(
+        'Статус',
+        null=True,
+    )
+
+    class Meta:
+        verbose_name_plural = 'Промокоды'
+        verbose_name = 'Промокод'
+
+    def __str__(self):
+        return f'{self.promo} {self.status}'
