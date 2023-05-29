@@ -4,7 +4,7 @@ from telebot import types
 from order_bot.other import bot, chats, client_markup, markup_choose, \
     number, markup_accept, markup_skip, markup_pay, agreement
 from order_bot.db_functions import get_salon_procedure, get_master_procedure, get_salons,\
-    get_masters, get_promo, get_decades, update_prepay_status
+    get_masters, get_promo, get_decades, update_prepay_status, create_client, get_ids
 
 
 def get_info(message: telebot.types.Message):
@@ -61,7 +61,7 @@ def create_order(message: telebot.types.Message, step=0):
             services = get_master_procedure(message.text)
         markup_services = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
         markup_services.add(number)
-        text = 'Предоставляемые услуги:'
+        text = f"Предоставляемые услуги:{user['master']}"
         for service in services:
             markup_services.add(types.KeyboardButton(service['title']))
             text += f"\n {service['title']}. Цена: {service['price']}"
@@ -71,7 +71,7 @@ def create_order(message: telebot.types.Message, step=0):
 
     elif step == 3:  # choose decade
         user['service'] = message.text
-        text = 'Выберите числа'
+        text = f'Выберите числа'
         if message.text == 'Позвонить':
             get_number(message)
             return
@@ -101,7 +101,7 @@ def create_order(message: telebot.types.Message, step=0):
         user['text'] = message.text
         if user['text'] == 'Позвонить':
             get_number(message)
-        user['day'] = message.text
+        user['date'] = message.text  # TODO str to datetime
         text = 'Введите номер телефона для связи с вами'
         msg = bot.send_message(message.chat.id, text)
         bot.register_next_step_handler(msg, create_order, 6)
@@ -125,6 +125,7 @@ def create_order(message: telebot.types.Message, step=0):
     elif step == 8:
         if message.text == 'Отменить':
             clean_user(user)
+            get_info(message)
             return
         text = 'Введите промокод'
         msg = bot.send_message(message.chat.id, text, reply_markup=markup_skip)
@@ -132,6 +133,8 @@ def create_order(message: telebot.types.Message, step=0):
     elif step == 9:
         if message.text != 'Пропустить':
             user['promo'] = get_promo(message.text)
+        salon_id, master_id, service_id = get_ids(user['salon'], user['master'], user['service'])
+        create_client(user['date'], salon_id, user['name'], user['phone_number'], master_id, service_id, False)
         text = 'Запись прошла успешно. Желаете оплатить сразу?'
         msg = bot.send_message(message.chat.id, text, reply_markup=markup_pay)
         bot.register_next_step_handler(msg, create_order, 10)
