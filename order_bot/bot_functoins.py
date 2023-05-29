@@ -15,6 +15,12 @@ def get_info(message: telebot.types.Message):
     user['callback'] = None
 
 
+def card_pay(num, date, cvc):
+    #  TODO use card_data for pay
+
+    return False  # return True if transaction verified
+
+
 def create_order(message: telebot.types.Message, step=0):
     user = chats[message.chat.id]
     if step == 0:  # main menu
@@ -88,7 +94,7 @@ def create_order(message: telebot.types.Message, step=0):
             get_number(message)
             return
         text = 'Выберите день'
-        days = [{'time': 1}, {'time': 2}, {'time': 3}]  # TODO add data from db. can use decade and month
+        days = [{'time': 1}, {'time': 2}, {'time': 3}]  # TODO add data from db
         markup_days = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
         markup_days.add(number)
 
@@ -101,7 +107,7 @@ def create_order(message: telebot.types.Message, step=0):
         user['text'] = message.text
         if user['text'] == 'Позвонить':
             get_number(message)
-        user['date'] = message.text  # TODO str to datetime
+        user['date'] = message.text  # TODO str to datetime. used in step==14
         text = 'Введите номер телефона для связи с вами'
         msg = bot.send_message(message.chat.id, text)
         bot.register_next_step_handler(msg, create_order, 6)
@@ -139,11 +145,40 @@ def create_order(message: telebot.types.Message, step=0):
         msg = bot.send_message(message.chat.id, text, reply_markup=markup_pay)
         bot.register_next_step_handler(msg, create_order, 10)
     elif step == 10:
-        text = 'Оплата прошла успешно'
+        text = 'введите номер карты'
+        msg = bot.send_message(message.chat.id, text)
+        bot.register_next_step_handler(msg, create_order, 11)
+    elif step == 11:
+        user['card_num'] = message.text
+        text = 'введите трехзначный номер карты'
+        msg = bot.send_message(message.chat.id, text)
+        bot.register_next_step_handler(msg, create_order, 12)
+    elif step == 12:
+        user['cvc'] = message.text
+        text = 'введите дату в формате MM/YY'
+        msg = bot.send_message(message.chat.id, text)
+        bot.register_next_step_handler(msg, create_order, 13)
+    elif step == 13:
+        user['card_date'] = message.text
+        text = f"""Ваша карта: {user['date']}
+        Номер: {user['card_num']}
+        Дата:{user['card_date']}
+        cvc: {user['cvc']}
+        """
+        msg = bot.send_message(message.chat.id, text, reply_markup=markup_pay)
+        bot.register_next_step_handler(msg, create_order, 14)
+    elif step == 14:
+        pay_status = card_pay(user['card_num'], user['card_date'], user['cvc'])
+        if pay_status:
+            text = 'Оплата прошла успешно'
+            update_prepay_status(name=user['name'], phone=user['phone_number'], date=user['date'], status=True)
+
+        else:
+            text = 'Оплата не удалась'
         if message.text == 'Оплатить':
             # TODO add pay form
-            update_prepay_status(name=user['name'], phone=user['phone'], date=user['date'], status=True)
-            msg = bot.send_message(message.chat.id, text)
+            date = ''
+        msg = bot.send_message(message.chat.id, text)
         msg = bot.send_message(message.chat.id, 'Оставайтесь с нами')
         clean_user(user)
         return
@@ -180,6 +215,9 @@ def clean_user(user):
         'date': None,
         'master': None,
         'salon': None,
+        'cvc': None,
+        'card_date': None,
+        'card_num': None,
 
         # TODO add more keys to clean
     })
@@ -200,5 +238,8 @@ def start_bot(message: telebot.types.Message):
         'date': None,
         'master': None,
         'salon': None,
+        'cvc': None,
+        'card_date': None,
+        'card_num': None,
     }
     show_main_menu(message.chat.id)
