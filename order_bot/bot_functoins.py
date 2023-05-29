@@ -43,7 +43,7 @@ def create_order(message: telebot.types.Message, step=0):
             markup_masters.add(number)
             for master in masters:
                 markup_masters.add(types.KeyboardButton(master['name']))
-            msg = bot.send_message(message.chat.id, 'Мастера:', reply_markup=markup_masters)
+            msg = bot.send_message(message.chat.id, masters, reply_markup=markup_masters)
             bot.register_next_step_handler(msg, create_order, 2)
         else:
             user['callback'] = None
@@ -115,8 +115,12 @@ def create_order(message: telebot.types.Message, step=0):
         bot.register_next_step_handler(msg, create_order, 7)
     elif step == 7:
         user['name'] = message.text
+        msg = bot.send_message(
+            message.chat.id,
+            'Соглашение на обработку персональных данных:',
+            reply_markup=markup_accept
+        )
         bot.send_document(message.chat.id, open(agreement, 'rb'))
-        msg = bot.send_message(message.chat.id, agreement, reply_markup=markup_accept)
         bot.register_next_step_handler(msg, create_order, 8)
     elif step == 8:
         if message.text == 'Отменить':

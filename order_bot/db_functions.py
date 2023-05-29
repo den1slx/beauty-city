@@ -18,18 +18,18 @@ def get_salons():
     cur: sqlite3.Cursor = con.execute(
         f'select title, address from order_bot_salon'
     )
-    row = cur.fetchone()
+    rows = cur.fetchall()
     cur.close()
-    return row
+    return rows
 
 
 def get_masters():
     cur: sqlite3.Cursor = con.execute(
         f'select name from order_bot_master'
     )
-    row = cur.fetchone()
+    rows = cur.fetchall()
     cur.close()
-    return row
+    return rows
 
 
 def get_procedure(id_procedure):
