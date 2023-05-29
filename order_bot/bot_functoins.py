@@ -171,13 +171,14 @@ def create_order(message: telebot.types.Message, step=0):
         pay_status = card_pay(user['card_num'], user['card_date'], user['cvc'])
         if pay_status:
             text = 'Оплата прошла успешно'
+            update_prepay_status(name=user['name'], phone=user['phone_number'], date=user['date'], status=True)
+
         else:
             text = 'Оплата не удалась'
         if message.text == 'Оплатить':
             # TODO add pay form
             date = ''
-            update_prepay_status(name=user['name'], phone=user['phone_number'], date=user['date'], status=True)
-            msg = bot.send_message(message.chat.id, text)
+        msg = bot.send_message(message.chat.id, text)
         msg = bot.send_message(message.chat.id, 'Оставайтесь с нами')
         clean_user(user)
         return
