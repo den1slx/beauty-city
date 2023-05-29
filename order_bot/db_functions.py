@@ -104,9 +104,15 @@ def update_prepay_status(name, phone, date, status):
 
 
 def get_ids(salon, master, service):
-    salon_id = Salon.objects.get(title=salon).id
-    master_id = Master.objects.get(name=master).id
-    service_id = Procedure.objects.get(title=service)
+    salon_id = None
+    master_id = None
+    service_id = None
+    if salon:
+        salon_id = Salon.objects.get(address=salon).id
+    if master:
+        master_id = Master.objects.get(name=master).id
+    if service:
+        service_id = Procedure.objects.get(title=service).id
     return salon_id, master_id, service_id
 
 
